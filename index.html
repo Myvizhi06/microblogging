@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse - Modern Microblogging</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="dark">
+  <div class="app-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar-left">
+      <div class="sidebar-top">
+        <a href="#" class="brand-logo" id="logoLink">
+          <i class="fa-solid fa-bolt"></i>
+          <span class="logo-text">Pulse</span>
+        </a>
+
+        <nav class="nav-menu">
+          <a href="#" class="nav-item active" data-filter="all">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </a>
+          <a href="#" class="nav-item" data-filter="explore">
+            <i class="fa-solid fa-hashtag"></i>
+            <span>Explore</span>
+          </a>
+          <a href="#" class="nav-item" data-filter="notifications">
+            <i class="fa-solid fa-bell"></i>
+            <span>Notifications</span>
+            <span class="badge" id="notifBadge">3</span>
+          </a>
+          <a href="#" class="nav-item" data-filter="bookmarks">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>Bookmarks</span>
+          </a>
+          <a href="#" class="nav-item" data-filter="my-posts">
+            <i class="fa-solid fa-user"></i>
+            <span>Profile</span>
+          </a>
+        </nav>
+
+        <button class="btn btn-primary btn-compose" id="focusComposerBtn">
+          <i class="fa-solid fa-feather-pointed"></i>
+          <span>Post</span>
+        </button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Light / Dark mode">
+          <i class="fa-solid fa-sun" id="themeIcon"></i>
+          <span id="themeText">Light Mode</span>
+        </button>
+
+        <div class="user-mini-card">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Current User Avatar" class="avatar" id="currentLoggedUserAvatar" />
+          <div class="user-details">
+            <div class="user-name-row">
+              <span class="name" id="currentLoggedUserName">Sarah Connor</span>
+              <i class="fa-solid fa-circle-check verified-badge"></i>
+            </div>
+            <span class="handle" id="currentLoggedUserHandle">@sarahc</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER FEED -->
+    <main class="main-content">
+      <!-- Top Sticky Header -->
+      <header class="feed-header">
+        <div class="header-title">
+          <h1 id="feedTitle">Home</h1>
+        </div>
+        <div class="feed-tabs">
+          <button class="tab-btn active" data-tab="all" id="tabForYou">For You</button>
+          <button class="tab-btn" data-tab="following" id="tabFollowing">Following</button>
+        </div>
+      </header>
+
+      <!-- Post Composer Box -->
+      <section class="composer-container">
+        <div class="composer-avatar-col">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar" />
+        </div>
+        <div class="composer-body">
+          <form id="postForm">
+            <textarea
+              id="postContent"
+              class="composer-textarea"
+              placeholder="What's on your mind? Share your thoughts, code, or ideas..."
+              rows="3"
+              maxlength="280"
+              required
+            ></textarea>
+
+            <!-- Image Preview Box -->
+            <div class="image-preview-wrapper" id="imagePreviewWrapper" style="display: none;">
+              <img id="imagePreview" src="" alt="Preview" />
+              <button type="button" class="btn-remove-image" id="removeImageBtn" title="Remove image">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <!-- Composer Actions Footer -->
+            <div class="composer-footer">
+              <div class="composer-tools">
+                <!-- File Input for Image -->
+                <label for="imageUploadInput" class="tool-btn" title="Add Image">
+                  <i class="fa-regular fa-image"></i>
+                  <input type="file" id="imageUploadInput" accept="image/*" hidden />
+                </label>
+                <!-- Add Image via URL prompt -->
+                <button type="button" class="tool-btn" id="imageByUrlBtn" title="Add Image URL">
+                  <i class="fa-solid fa-link"></i>
+                </button>
+                <!-- Tag Prompt Button -->
+                <button type="button" class="tool-btn" id="addTagBtn" title="Add Hashtag">
+                  <i class="fa-solid fa-hashtag"></i>
+                </button>
+                <!-- Emoji Quick Append -->
+                <button type="button" class="tool-btn" id="addEmojiBtn" title="Add Emoji">
+                  <i class="fa-regular fa-face-smile"></i>
+                </button>
+              </div>
+
+              <div class="composer-actions">
+                <div class="char-count-wrap">
+                  <span id="charCount">280</span>
+                </div>
+                <button type="submit" class="btn btn-primary" id="publishBtn" disabled>
+                  Post
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Search Filter Alert (Hidden by default, shown when filtering) -->
+      <div class="active-filter-banner" id="filterBanner" style="display: none;">
+        <span>Showing results for: <strong id="filterQueryLabel"></strong></span>
+        <button id="clearFilterBtn" class="btn-clear-filter">Clear filter <i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Feed Stream -->
+      <section class="posts-stream" id="postsStream">
+        <!-- Dynamic posts will be injected here via JavaScript -->
+      </section>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <i class="fa-regular fa-compass"></i>
+        <h3>No posts found</h3>
+        <p>Be the first to share your thoughts or try clearing your search filters!</p>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar-right">
+      <!-- Search Box -->
+      <div class="search-widget">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search Pulse, tags, users..." autocomplete="off" />
+        <button class="clear-search-btn" id="clearSearchBtn" style="display: none;">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Trending Section -->
+      <div class="widget-card trending-widget">
+        <h3 class="widget-title">What's Happening</h3>
+        <div class="trending-list" id="trendingList">
+          <div class="trending-item" data-tag="#WebDevelopment">
+            <div class="trending-meta">Trending in Tech · 24.5k posts</div>
+            <div class="trending-topic">#WebDevelopment</div>
+          </div>
+          <div class="trending-item" data-tag="#JavaScript">
+            <div class="trending-meta">Trending in Coding · 18.2k posts</div>
+            <div class="trending-topic">#JavaScript</div>
+          </div>
+          <div class="trending-item" data-tag="#ArtificialIntelligence">
+            <div class="trending-meta">Technology · 54.1k posts</div>
+            <div class="trending-topic">#ArtificialIntelligence</div>
+          </div>
+          <div class="trending-item" data-tag="#OpenSource">
+            <div class="trending-meta">Trending worldwide · 12.8k posts</div>
+            <div class="trending-topic">#OpenSource</div>
+          </div>
+          <div class="trending-item" data-tag="#DesignTrends">
+            <div class="trending-meta">Design · 9.4k posts</div>
+            <div class="trending-topic">#DesignTrends</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who to Follow -->
+      <div class="widget-card follow-widget">
+        <h3 class="widget-title">Who to Follow</h3>
+        <div class="follow-list" id="followList">
+          <!-- Follow User Item 1 -->
+          <div class="follow-item" data-user-id="alex">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80" alt="Alex Chen" class="avatar" />
+            <div class="user-meta">
+              <span class="user-name">Alex Chen</span>
+              <span class="user-handle">@alexc_dev</span>
+            </div>
+            <button class="btn btn-outline btn-follow" data-user="alex">Follow</button>
+          </div>
+
+          <!-- Follow User Item 2 -->
+          <div class="follow-item" data-user-id="maya">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Maya Lin" class="avatar" />
+            <div class="user-meta">
+              <span class="user-name">Maya Lin</span>
+              <span class="user-handle">@mayaui</span>
+            </div>
+            <button class="btn btn-outline btn-follow" data-user="maya">Follow</button>
+          </div>
+
+          <!-- Follow User Item 3 -->
+          <div class="follow-item" data-user-id="devin">
+            <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80" alt="Devin Brooks" class="avatar" />
+            <div class="user-meta">
+              <span class="user-name">Devin Brooks</span>
+              <span class="user-handle">@devinb</span>
+            </div>
+            <button class="btn btn-outline btn-follow" data-user="devin">Follow</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <footer class="app-footer">
+        <p>&copy; 2026 Pulse Microblog · Terms · Privacy · Cookies</p>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript Link -->
+  <script src="script.js"></script>
+</body>
+</html>
+
